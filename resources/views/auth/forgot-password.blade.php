@@ -1,25 +1,45 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+    <section class="auth-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="auth-card">
+                        <div class="row no-gutters">
+                            <div class="col-lg-5 d-none d-lg-block">
+                                <div class="auth-left">
+                                    <h2>Lupa Password?</h2>
+                                    <p>Masukkan email Anda untuk menerima tautan reset password dan membuat password baru.</p>
+                                    <a class="auth-switch-btn" href="{{ route('login') }}">Kembali ke Login</a>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <div class="auth-right">
+                                    <h3>Reset Password</h3>
+                                    <p class="auth-subtitle">Kami akan mengirimkan tautan ulang ke alamat email Anda.</p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+                                    @if (session('status'))
+                                        <div class="alert alert-success mb-3" role="alert" style="border-radius: 8px; font-size: 0.95rem;">
+                                            {{ session('status') }}
+                                        </div>
+                                    @endif
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                                    <form method="POST" action="{{ route('password.email') }}">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="email">Email</label>
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="Masukkan email" required autofocus>
+                                            @error('email')
+                                                <span class="text-danger mt-1 d-block" style="font-size: 13px;">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <button type="submit" class="auth-submit-btn">Kirim Tautan Reset</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
+    </section>
 </x-guest-layout>
