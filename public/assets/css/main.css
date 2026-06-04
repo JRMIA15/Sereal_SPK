@@ -1209,6 +1209,11 @@ h1, h2, h3, h4, h5, h6 {
   background: url(../img/banner/banner-bg.jpg) center no-repeat;
   background-size: cover;
   position: relative; }
+  
+/* hide overflow from absolutely positioned slider nav so it doesn't increase page height */
+.banner-area {
+  overflow: hidden;
+}
   @media (max-width: 768px) {
     .banner-area .fullscreen {
       height: 650px !important; } }
@@ -1239,6 +1244,13 @@ h1, h2, h3, h4, h5, h6 {
         opacity: 1; }
   .banner-area .banner-content {
     padding-left: 10px; }
+    .banner-area .banner-content,
+    .banner-area .banner-img {
+      padding-top: 38px; }
+    @media (max-width: 767px) {
+      .banner-area .banner-content,
+      .banner-area .banner-img {
+        padding-top: 32px; } }
     @media (max-width: 991px) {
       .banner-area .banner-content {
         padding-left: 0; } }
@@ -5664,6 +5676,11 @@ label {
 .footer-area {
   padding-top: 100px;
   background-color: #222222; }
+
+/* ensure footer sits at the bottom of the page when using flex column layout */
+.footer-area {
+  margin-top: auto;
+}
   .footer-area h6 {
     color: #fff;
     margin-bottom: 25px;
