@@ -48,11 +48,13 @@ class RankingController extends Controller
         $rankings = [];
         foreach ($sereals as $sereal) {
             $normalized = [];
+            $realValues = [];
             $score = 0.0;
 
             foreach ($kriterias as $kriteria) {
                 $pivotVal = $sereal->kriterias->firstWhere('id', $kriteria->id);
                 $val = $pivotVal ? floatval($pivotVal->pivot->value) : 0.0;
+                $realValues[$kriteria->id] = $val;
 
                 $max = $minMax[$kriteria->id]['max'];
                 $min = $minMax[$kriteria->id]['min'];
@@ -80,17 +82,31 @@ class RankingController extends Controller
             $rankings[] = [
                 'sereal' => $sereal,
                 'normalized' => $normalized,
+                'real_values' => $realValues,
                 'score' => round($score, 4),
             ];
         }
 
-        // Step 4: Sort rankings descending by score
-        usort($rankings, function ($a, $b) {
-            return $b['score'] <=> $a['score'];
-        });
+        // Find the best alternative (always based on the highest SAW score)
+        $bestAlternative = null;
+        if (!empty($rankings)) {
+            $bestAlternative = collect($rankings)->sortByDesc('score')->first();
+        }
 
-        // Find the best alternative
-        $bestAlternative = !empty($rankings) ? $rankings[0] : null;
+        // Handle sorting
+        $sortBy = request('sort_by');
+        if ($sortBy && $kriterias->contains('id', $sortBy)) {
+            usort($rankings, function ($a, $b) use ($sortBy) {
+                $valA = $a['real_values'][$sortBy] ?? 0.0;
+                $valB = $b['real_values'][$sortBy] ?? 0.0;
+                return $valB <=> $valA; // Descending (tertinggi)
+            });
+        } else {
+            // Step 4: Sort rankings descending by score
+            usort($rankings, function ($a, $b) {
+                return $b['score'] <=> $a['score'];
+            });
+        }
 
         return view('ranking', [
             'rankings' => $rankings,

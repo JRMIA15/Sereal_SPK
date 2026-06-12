@@ -23,7 +23,7 @@
         .ranking-subtitle {
             color: #718096;
             font-size: 0.95rem;
-            margin-bottom: 30px;
+            margin-bottom: 0;
         }
 
         .btn-action-outline {
@@ -218,16 +218,61 @@
                 color: #000000 !important;
             }
         }
+
+        /* nice-select overrides for filter dropdown */
+        #filterForm .nice-select {
+            float: none !important;
+            display: inline-flex !important;
+            align-items: center;
+            flex-grow: 1;
+            width: auto !important;
+            height: 44px;
+            line-height: 42px;
+            border-radius: 6px;
+            border-color: #cbd5e0;
+            padding-left: 15px;
+            padding-right: 40px;
+        }
+        #filterForm .nice-select .current {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        #filterForm .nice-select .list {
+            width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        #filterForm .nice-select .option {
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 0.9rem;
+        }
     </style>
 
     <div class="container-fluid px-md-5" style="margin-top: 130px; margin-bottom: 80px;">
         <div class="ranking-card">
-            <div class="row align-items-center mb-4">
-                <div class="col-md-7">
+            <div class="row align-items-center mb-5">
+                <div class="col-md-5">
                     <h2 class="ranking-title">Hasil Rekomendasi Sereal</h2>
                     <p class="ranking-subtitle">Berdasarkan perhitungan metode Simple Additive Weighting (SAW)</p>
                 </div>
-                <div class="col-md-5 text-md-right mb-4 mb-md-0 no-print">
+                <div class="col-md-4 mb-3 mb-md-0 no-print">
+                    <form action="{{ route('ranking') }}" method="GET" id="filterForm" class="w-100">
+                        <div class="form-group mb-0 d-flex align-items-center w-100">
+                            <label for="sort_by" class="mr-2 mb-0 font-weight-bold text-secondary text-nowrap" style="font-size: 0.9rem;">Urutkan Kriteria:</label>
+                            <select name="sort_by" id="sort_by" class="form-control wide" style="height: 44px; border-radius: 6px;">
+                                <option value="">-- Rekomendasi SAW (Default) --</option>
+                                @foreach($kriterias as $kriteria)
+                                    <option value="{{ $kriteria->id }}" {{ request('sort_by') == $kriteria->id ? 'selected' : '' }}>
+                                        {{ strtoupper($kriteria->code) }} ({{ $kriteria->name }}) Tertinggi
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-3 text-md-right mb-3 mb-md-0 no-print">
                     <button onclick="window.print()" class="btn-action-solid">
                         <i class="fa fa-download mr-2"></i> Export PDF
                     </button>
@@ -269,11 +314,11 @@
                         <thead>
                             <tr>
                                 <th style="width: 100px; text-align: center;">Peringkat</th>
-                                <th>Alternatif (Merek Sereal)</th>
+                                <th>Merek Sereal</th>
                                 @foreach($kriterias as $kriteria)
-                                    <th style="text-align: center;" title="{{ $kriteria->name }}">{{ $kriteria->code }}</th>
+                                    <th style="text-align: center;" title="{{ $kriteria->name }}">{{ strtoupper($kriteria->code) }} ({{ $kriteria->name }})</th>
                                 @endforeach
-                                <th class="score-col" style="width: 160px;">Skor Akhir</th>
+                                <th class="score-col" style="width: 160px;">Skor Akhir (AVG)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -306,4 +351,24 @@
             @endif
         </div>
     </div>
+
+    <!-- Script to handle niceSelect change event and submit the form -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('load', function() {
+                var sortBy = document.getElementById('sort_by');
+                if (sortBy) {
+                    if (window.jQuery) {
+                        window.jQuery('#sort_by').on('change', function() {
+                            document.getElementById('filterForm').submit();
+                        });
+                    } else {
+                        sortBy.addEventListener('change', function() {
+                            document.getElementById('filterForm').submit();
+                        });
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

@@ -23,9 +23,9 @@
                 <thead>
                     <tr>
                         <th style="width: 80px; text-align: center;">No</th>
-                        <th>Nama Alternatif (Sereal)</th>
+                        <th>Nama Sereal</th>
                         @foreach($kriterias as $kriteria)
-                            <th style="text-align: center;" title="{{ $kriteria->name }} ({{ ucfirst($kriteria->type) }})">{{ $kriteria->code }}</th>
+                            <th style="text-align: center;" title="{{ $kriteria->name }} ({{ ucfirst($kriteria->type) }})">{{ strtoupper($kriteria->code) }} ({{ $kriteria->name }})</th>
                         @endforeach
                         @if(auth()->check() && auth()->user()->role === 'admin')
                             <th style="width: 120px; text-align: center;">Aksi</th>
